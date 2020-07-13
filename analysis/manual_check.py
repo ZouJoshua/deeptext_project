@@ -22,7 +22,7 @@
 import csv
 import random
 import json
-from analysis.utils import read_xlrd
+from general_tools.utils import read_xlrd
 
 
 def get_check_example(csv_file, example_file):

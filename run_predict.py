@@ -9,8 +9,13 @@ import os
 import time
 
 
+def sigmoid(x):
+    s = 1 / (1 + np.exp(-x))
+    return s
+
+
 def load_txt(config):
-    ff = open(config.data.test_text_file, encoding='utf8')
+    ff = open(config.eval.text_file, encoding='utf8')
     txt = ff.read().split('\n')
     txt = txt[0:len(txt) - 1]
     ff.close()
@@ -21,16 +26,18 @@ def load_tag(config):
     f_tag = open(config.data.dict_dir + '/label.dict', encoding='utf8')
     tag_dict = f_tag.readlines()
     f_tag.close()
-    tag_list_name = []
-    tag_list_num = []
+    tag_name_list = []
+    tag_num_list = []
     for tag in tag_dict:
-        tag_list_name.append(tag.split('\t')[0])
-        tag_list_num.append(tag.split('\t')[1])
-    return tag_list_name, tag_list_num
+        tag_name, tag_num = tag.split('\t')
+        tag_name_list.append(tag_name)
+        tag_num_list.append(tag_num)
+    return tag_name_list, tag_num_list
 
 
 def get_threshold(dict_map, probs, labels):
-    threshold = []
+    recall_threshold = list()
+    threshold = list()
     for idx_label in range(len(probs[0, :])):
         rightlabel = 0
         for i in range(len(labels)):
@@ -40,6 +47,7 @@ def get_threshold(dict_map, probs, labels):
 
         idx_list = probs[:, idx_label].argsort(axis=0)
         idx_list = idx_list[::-1]
+        recall_list = []
         fscore_list = []
         TP = 0
         for i in range(len(labels)):
@@ -51,29 +59,35 @@ def get_threshold(dict_map, probs, labels):
                     break
             if rightlabel == 0:
                 fscore_list.append(0)
+                recall_list.append(0)
                 continue
             recall = TP / rightlabel
+            recall_list.append(recall)
             prcs = TP / (i + 1)
             if (recall + prcs) == 0:
                 fscore_list.append(0)
             else:
                 fscore_list.append(2 * recall * prcs / (recall + prcs))
-
+        recall_threshold.append(probs[idx_list[recall_list.index(max(recall_list))], idx_label])
         threshold.append(probs[idx_list[fscore_list.index(max(fscore_list))], idx_label])
-    f = open('result/threhold.txt', 'w+', encoding='utf-8')
+    f = open('result/threshold.txt', 'w+', encoding='utf-8')
     f.write(str(threshold))
     f.close()
+    np.save("result/threshold", np.array(threshold))
     print(threshold)
+    print(recall_threshold)
     return threshold
 
 
-def result_save(txt, probs_all, config):
+def result_save(txt, probs_all, config, use_special_label=False):
     test_classname = []
     title = []
     content = []
 
     for line in txt:
         line_str = line.split('\t')
+        if line_str[0] in ["社会", "时政", "国际", "军事"] and use_special_label:
+            line_str[0] = "社会|时政|国际|军事"
         test_classname.append(line_str[0])
         if "#   #   #" in line_str[1]:
             text = line_str[1].split("#   #   #")
@@ -142,10 +156,10 @@ def result_save(txt, probs_all, config):
         y_true = np.array([sum(I[x].astype(int)).tolist() for x in y_true_labels])
 
         # 多标签预测结果.  y_pred与y_true的shape不一致，y_true有y_pred未覆盖的label
-        probs_th = (probs - threshold) / threshold
+        probs_th = sigmoid((probs - threshold) / threshold)
         y_pred = np.zeros_like(probs_th)
         for i in range(len(probs_th)):
-            prob_bool = (probs_th[i] >= 0).astype(int)
+            prob_bool = (probs_th[i] >= 0.5).astype(int)
             if sum(prob_bool) == 0:
                 y_pred[i] = (probs_th[i] == max(probs_th[i])).astype(int)
             else:
@@ -213,4 +227,4 @@ if __name__ == '__main__':
     tag_dict, tag_list_num = load_tag(config)
     probs_all = predictor.predict(txt)
     # probs_all=probs_all1+probs_all2
-    result_save(txt, probs_all, config)
+    result_save(txt, probs_all, config, use_special_label=False)

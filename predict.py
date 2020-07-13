@@ -26,6 +26,11 @@ from config import Config
 from data_processor import DataProcessor
 
 
+def sigmoid(x):
+    s = 1 / (1 + np.exp(-x))
+    return s
+
+
 class Predictor(object):
     def __init__(self, config):
         self.config = config
@@ -34,6 +39,10 @@ class Predictor(object):
         self.signature_def_list = []
         self._read_sessions(self.config.predict.model_dirs,
                             self.config.predict.model_tag)
+        if self.config.predict.cascade_model_dirs and self.config.predict.use_cascade_model:
+            self._read_sessions(self.config.predict.cascade_model_dirs,
+                                self.config.predict.model_tag)
+
         self.model_weights = []
         for model_weight in self.config.predict.model_weights:
             self.model_weights.append(float(model_weight))
@@ -121,6 +130,75 @@ class Predictor(object):
             # probs
             outputs = self._single_model_predict(
                 self.signature_def_list[0], self.sess_model_list[0], examples)
+        else:
+            # vote counts
+            outputs = np.zeros(
+                    [len(texts), 1, len(self.data_processor.label_map)])
+            for i in range(len(self.sess_model_list)):
+                scores = self._single_model_predict(
+                    self.signature_def_list[i], self.sess_model_list[i],
+                    examples)
+                print('here_over')
+                for k in range(len(scores)):
+                    outputs[k] += scores[k] * self.model_weights[i]
+
+        return outputs
+
+    def predict_cascade_model(self, texts):
+        """Predict example. If one model, output probs.
+        If multi model, output the model ensemble result.
+        Args:
+            text: Text to predict.
+        returns:
+             If one model, output probs.
+             If multi model, output the model ensemble result.
+        """
+        examples = []
+        for text in texts:
+            example, feature_sample = \
+                    self.data_processor.get_tfexample_from_text(text, False)
+
+            if example is None:
+                return None
+            feature_str = json.dumps(feature_sample, ensure_ascii=False)
+            self.feature_debug_file.write(feature_str + "\n")
+            example = example.SerializeToString()
+            examples.append(example)
+
+        if len(self.sess_model_list) == 2 and self.config.predict.model_dirs and self.config.predict.cascade_model_dirs:
+            # probs
+            main_outputs = self._single_model_predict(
+                self.signature_def_list[0], self.sess_model_list[0], examples)
+            # print(main_outputs.shape)
+            # print(type(main_outputs))
+            large_label_outputs = self._single_model_predict(
+                self.signature_def_list[1], self.sess_model_list[1], examples)
+            # 增强召回特殊大类()
+            main_prob_list = [main_outputs[i][0] for i in range(len(main_outputs))]
+            main_probs = np.array(main_prob_list)
+            if self.config.predict.cascade_model_threshold_file:
+                with open(self.config.predict.cascade_model_threshold_file, "r", encoding="utf-8") as f:
+                    threshold = eval(f.readline().strip())
+                probs_th = sigmoid((main_probs - threshold) / threshold)
+                main_pred_probs = np.zeros_like(probs_th)
+                # print(main_pred_probs.shape)
+                for i in range(len(probs_th)):
+                    prob_bool = (probs_th[i] >= 0.5).astype(int)
+                    if sum(prob_bool) == 0:
+                        main_pred_probs[i] = (probs_th[i] == max(probs_th[i])).astype(int)
+                    else:
+                        main_pred_probs[i] = prob_bool
+                main_probs = main_pred_probs
+
+            main_pred = main_probs.argmax(axis=1)
+            main_label = [self.data_processor.id_to_label_map[label_id] for label_id in main_pred]
+            # print(main_label)
+            for i, label in enumerate(main_label):
+                if label == self.data_processor.SPECIAL_LABEL:
+
+                    main_outputs[i, :, :] = large_label_outputs[i, :, :]
+
+            outputs = main_outputs
         else:
             # vote counts
             outputs = np.zeros(

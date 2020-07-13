@@ -85,7 +85,7 @@ def Train(config):
         data_processor.load_all_dict()
     else:
         logger.info("Processed text files")
-        data_processor.process_from_text_file()
+        data_processor.process_from_text_file(use_exists_dict=True)
     params = dict()
     params["label_size"] = len(data_processor.label_map)
     params["feature_names"] = config.feature_common.feature_names.split(",")
@@ -137,7 +137,7 @@ def Train(config):
         fscore, _ = eval_predict(
             estimator, data_processor, validate_tfrecord_file, evaluator,
             validate_labels, logger, "Epoch %d validate" % i, config)
-        logger.info("Epoch {} validate score: {} ****** Up to now, best validate score: {}".format(i, fscore, best_validate_fscore))
+        logger.info("Epoch {} validate score: {} ****** last best validate score: {}".format(i, fscore, best_validate_fscore))
         if fscore > best_validate_fscore:
             best_validate_fscore = fscore
             _, test_log_str = eval_predict(
