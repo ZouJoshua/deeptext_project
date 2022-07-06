@@ -159,7 +159,7 @@ def get_df_result(y_true, y_pre):
 
 
 def main():
-    file = "/Users/vivo/work/data/category/点检数据/内容质量点检2020-26周.xlsx"
+    file = "/work/data/category/点检数据/内容质量点检2020-26周.xlsx"
     calculate(file)
 
 

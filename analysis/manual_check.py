@@ -114,10 +114,10 @@ def get_badcase(csv_file, example_file):
 
 
 def main():
-    # file = "/Users/vivo/work/data/result_check.csv"
+    # file = "/work/data/result_check.csv"
     # outfile = "./result_sample_check.csv"
     # get_check_example(file, outfile)
-    excel_file = "/Users/vivo/Desktop/result_sample_check.xlsx"
+    excel_file = "/Desktop/result_sample_check.xlsx"
     analysis_example(excel_file)
 
 if __name__ == "__main__":

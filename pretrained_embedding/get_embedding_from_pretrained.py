@@ -39,11 +39,11 @@ def write_embedding_to_file(feature_file, out_embedding_file, pretrained_embeddi
 
 
 def main():
-    tencent_pretrain_file = "/data222/11101872/concept-tagging/data/word_embedding/Tencent_AILab_ChineseEmbedding.txt"
-    char_dict = "/data222/11121175/classifier_result/dict/dict_main/char.dict"
-    token_dict = "/data222/11121175/classifier_result/dict/dict_main/token.dict"
-    token_pretrain_file = "/data222/11121175/classifier_result/pretrained_embedding/token_pretrained_embedding.txt"
-    char_pretrain_file = "/data222/11121175/classifier_result/pretrained_embedding/char_pretrained_embedding.txt"
+    tencent_pretrain_file = "/data/word_embedding/Tencent_AILab_ChineseEmbedding.txt"
+    char_dict = "classifier_result/dict/dict_main/char.dict"
+    token_dict = "classifier_result/dict/dict_main/token.dict"
+    token_pretrain_file = "classifier_result/pretrained_embedding/token_pretrained_embedding.txt"
+    char_pretrain_file = "classifier_result/pretrained_embedding/char_pretrained_embedding.txt"
     pretrained_embedding = get_pretrained_embedding(tencent_pretrain_file)
     write_embedding_to_file(char_dict, char_pretrain_file, pretrained_embedding)
     write_embedding_to_file(token_dict, token_pretrain_file, pretrained_embedding)

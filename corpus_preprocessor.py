@@ -591,7 +591,7 @@ def pre_public_process():
 
 
 def pre_process():
-    data_file = "/Users/vivo/work/data/corpus_data"
+    data_file = "/work/data/corpus_data"
     out_dir = "./data"
     PreCorpus(data_file, out_dir)
 
@@ -615,10 +615,10 @@ def get_label_dist():
 
 
 def pre_process_v1():
-    file = "/Users/vivo/work/data/category/corpus/20200615180704_trec_train.txt"
+    file = "/work/data/category/corpus/20200615180704_trec_train.txt"
     outfile = "data/train.txt"
     PreCorpusV1(file, outfile)
-    val_file = "/Users/vivo/work/data/category/corpus/20200615180723_trec_test.txt"
+    val_file = "/work/data/category/corpus/20200615180723_trec_test.txt"
     val_outfile = "data/validation.txt"
     PreCorpusV1(val_file, val_outfile)
 

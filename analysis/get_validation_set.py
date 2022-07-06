@@ -158,7 +158,7 @@ def label_dist(all_label):
 
 
 def main():
-    excel_file = "/Users/vivo/work/data/9-25周周点检数据/all_spot_check.xlsx"
+    excel_file = "/work/data/9-25周周点检数据/all_spot_check.xlsx"
     outfile = "./all_spot_check.txt"
     # write_validation_set_to_file(excel_file, outfile)
     label_count(outfile)

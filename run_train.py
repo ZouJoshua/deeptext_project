@@ -41,7 +41,7 @@ for batch_size in batch_size_list:
                 model_path = "batch_size_{}lr_{}drop_{}_fasttext_v1".format(config.train.batch_size,
                                                                             config.train.learning_rate, drop)
 
-                if os.path.exists("/data222/11121175/classifier_result/model_save_best/{}".format(model_path)):
+                if os.path.exists("classifier_result/model_save_best/{}".format(model_path)):
                     continue
 
                 Train(config)
@@ -54,9 +54,9 @@ for batch_size in batch_size_list:
 
                 path = files[idx_model - 1]
 
-                shutil.copytree("export_model/", "/data222/11121175/classifier_result/model_all/{}".format(model_path))
-                shutil.copytree("export_model/{}".format(path), "/data222/11121175/classifier_result/model_save_best/{}".format(model_path))
-                shutil.copytree("eval_dir/", "/data222/11121175/classifier_result/result_save/{}".format(model_path))
+                shutil.copytree("export_model/", "classifier_result/model_all/{}".format(model_path))
+                shutil.copytree("export_model/{}".format(path), "classifier_result/model_save_best/{}".format(model_path))
+                shutil.copytree("eval_dir/", "classifier_result/result_save/{}".format(model_path))
                 os.remove('Best.txt')
                 # clean data
                 shutil.rmtree('export_model', ignore_errors=True)

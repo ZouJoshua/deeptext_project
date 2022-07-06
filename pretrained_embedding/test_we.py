@@ -15,11 +15,11 @@ import numpy as np
 
 
 def redis_conn():
-    redis_nodes = [{'host': 'feedsad-user-online-behavior4.redis.dba.vivo.lan.', 'port': 11104},
-                   {'host': 'feedsad-user-online-behavior3.redis.dba.vivo.lan.', 'port': 13400},
-                   {'host': 'feedsad-user-online-behavior2.redis.dba.vivo.lan.', 'port': 11103},
-                   {'host': 'feedsad-user-online-behavior1.redis.dba.vivo.lan.', 'port': 13399},
-                   {'host': 'feedsad-user-online-behavior0.redis.dba.vivo.lan.', 'port': 11101}]
+    redis_nodes = [{'host': 'xx', 'port': 5555},
+                   {'host': 'xx', 'port': 5555},
+                   {'host': 'xx', 'port': 5555},
+                   {'host': 'xx', 'port': 5555},
+                   {'host': 'xx', 'port': 5555}]
     try:
         redisconn = StrictRedisCluster(startup_nodes=redis_nodes)
     except Exception as e:

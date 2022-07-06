@@ -4,7 +4,7 @@
 @Author  : Joshua
 @Time    : 2020/6/30 6:09 下午
 @File    : get_spot_check_data_from_kafka.py
-@Desc    : 从kafka队列获取谛听标注数据
+@Desc    : 从kafka队列读取数据
 
 """
 
@@ -12,11 +12,11 @@ import kafka_handler
 import time
 
 # kafka.
-kafka_user = "recommend_online"
-kafka_password = "WGlQV0JCZUVXZg=="
-kakfa_servers = "moli-kafka.prd.vivo.lan:9092"
-kafka_topic = "feedscontent_push_tag_article"
-kafka_group = "get_diting_tag"
+kafka_user = ""
+kafka_password = ""
+kakfa_servers = ""
+kafka_topic = ""
+kafka_group = ""
 kafka_result_consumer = kafka_handler.Consumer(kakfa_servers, kafka_user, kafka_password,
                                                kafka_topic, kafka_group)
 

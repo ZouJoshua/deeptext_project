@@ -177,7 +177,7 @@ def write_validation3_set_to_file(file, outfile):
 
 
 def main():
-    excel_file = "/Users/vivo/work/data/9-25周周点检数据/all_spot_check.xlsx"
+    excel_file = "/work/data/9-25周周点检数据/all_spot_check.xlsx"
     outfile = "./all_tag_test.txt"
     validation_set_outfile = "./tag3.0_test_corpus.txt"
     # write_validation_set_to_file(excel_file, outfile)
